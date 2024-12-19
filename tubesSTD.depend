@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1733074494 source:c:\users\rakan\documents\telkom\smt3\std\tubesstd\main.cpp
+	"graph.h"
+
+1733074003 c:\users\rakan\documents\telkom\smt3\std\tubesstd\graph.h
+	<iostream>
+	<string>
+
+1733074601 source:c:\users\rakan\documents\telkom\smt3\std\tubesstd\graph.cpp
+	"graph.h"
+
