@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <string>
-
+#include <climits>
 using namespace std;
 
-#define idStasiun(S) S->idStasiun
+// Define macros for easier access to node properties
+#define namaStasiun(S) S->namaStasiun
 #define nextStasiun(S) S->nextStasiun
 #define firstStasiun(G) G.firstStasiun
 #define firstRute(S) S->firstRute
@@ -21,31 +22,30 @@ typedef stasiunTransit *adrStasiun;
 typedef Rute *adrRute;
 
 struct stasiunTransit {
-    string idStasiun;
-    adrStasiun nextStasiun;
-    adrRute firstRute;
+    string namaStasiun; // Nama stasiun sebagai ID unik
+    adrStasiun nextStasiun; // Pointer ke stasiun berikutnya
+    adrRute firstRute; // Pointer ke rute pertama dari stasiun ini
 };
 
 struct Rute {
-    string destStasiunID;
-    int weight;
-    adrRute nextRute;
+    string destStasiunID; // Nama stasiun tujuan
+    int weight; // Bobot rute
+    adrRute nextRute; // Pointer ke rute berikutnya
 };
 
 struct Graph {
-    adrStasiun firstStasiun;
+    adrStasiun firstStasiun; // Pointer ke stasiun pertama dalam graph
 };
 
-void createStasiun(string newStasiunID, adrStasiun &S);
+// Fungsi dan prosedur untuk operasi pada graph
+void createStasiun(string newNamaStasiun, adrStasiun &S);
 void initGraph(Graph &G);
-void addStasiun(Graph &G, string newStasiunID);
-void buildGraph(Graph &G);
-void addRute(Graph &G, string fromStasiunID, string toStasiunID, int weight);
-bool findStasiun(Graph &G, string stasiunID, adrStasiun &S);
-bool findRute(Graph &G, string fromStasiunID, string toStasiunID, adrRute &R);
+void addStasiun(Graph &G, string newNamaStasiun);
+void deleteStasiun(Graph &G, string namaStasiun);
+void addRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, int weight);
+bool findStasiun(Graph &G, string namaStasiun, adrStasiun &S);
+bool findRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, adrRute &R);
 void displayGraph(Graph &G);
-void shortestRoute(Graph &G, string startID, string endID);
-void removeStasiun(Graph &G, string stasiunID);
-void removeRute(Graph &G, string fromStasiunID, string toStasiunID);
+void shortestRoute(Graph &G, string startNama, string endNama);
 
 #endif // GRAPH_H_INCLUDED

@@ -9,3 +9,20 @@
 1733074601 source:c:\users\rakan\documents\telkom\smt3\std\tubesstd\graph.cpp
 	"graph.h"
 
+1734593145 source:c:\users\rakan\documents\github\tubesstd\graph.cpp
+	"graph.h"
+	<iostream>
+	<string>
+	<map>
+	<functional>
+	<climits>
+
+1734592990 c:\users\rakan\documents\github\tubesstd\graph.h
+	<iostream>
+	<string>
+	<climits>
+
+1734593286 source:c:\users\rakan\documents\github\tubesstd\main.cpp
+	"graph.h"
+	<iostream>
+
