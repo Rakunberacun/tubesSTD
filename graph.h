@@ -46,6 +46,7 @@ void addRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, int weight)
 bool findStasiun(Graph &G, string namaStasiun, adrStasiun &S);
 bool findRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, adrRute &R);
 void displayGraph(Graph &G);
-void shortestRoute(Graph &G, string startNama, string endNama);
+void shortestRoute(Graph &G, string startID, string endID);
+void dfsShortestRoute(adrStasiun current, string endID, int currentWeight, int &minWeight, string path, string &shortestPath, Graph &G, string visited[], int &visitedCount);
 
 #endif // GRAPH_H_INCLUDED

@@ -38,7 +38,8 @@ int main() {
             case 2: {
                 string namaStasiun;
                 cout << "\nMasukkan nama stasiun yang ingin dicari: ";
-                cin >> namaStasiun;
+                cin.ignore(INT_MAX, '\n'); // Clear the input buffer
+                getline(cin, namaStasiun);
                 adrStasiun S;
                 if (findStasiun(G, namaStasiun, S)) {
                     cout << "Stasiun " << namaStasiun << " ditemukan." << endl;
@@ -50,9 +51,12 @@ int main() {
             case 3: {
                 string fromNamaStasiun, toNamaStasiun;
                 cout << "\nMasukkan nama stasiun asal: ";
-                cin >> fromNamaStasiun;
+                cin.ignore(INT_MAX, '\n'); // Clear the input buffer
+                getline(cin,fromNamaStasiun);
+
                 cout << "Masukkan nama stasiun tujuan: ";
-                cin >> toNamaStasiun;
+                getline(cin, toNamaStasiun);
+
                 adrRute R;
                 if (findRute(G, fromNamaStasiun, toNamaStasiun, R)) {
                     cout << "Rute ditemukan dengan bobot: " << weight(R) << endl;
@@ -64,16 +68,20 @@ int main() {
             case 4: {
                 string startNama, endNama;
                 cout << "\nMasukkan nama stasiun asal: ";
-                cin >> startNama;
+                cin.ignore(INT_MAX, '\n');
+                getline(cin, startNama);
+
                 cout << "Masukkan nama stasiun tujuan: ";
-                cin >> endNama;
+                getline(cin,endNama);
+
                 shortestRoute(G, startNama, endNama);
                 break;
             }
             case 5: {
                 string namaStasiun;
                 cout << "\nMasukkan nama stasiun baru: ";
-                cin >> namaStasiun;
+                cin.ignore(INT_MAX, '\n');
+                getline(cin, namaStasiun);
                 addStasiun(G, namaStasiun);
                 cout << "Stasiun " << namaStasiun << " berhasil ditambahkan." << endl;
                 break;
@@ -81,7 +89,8 @@ int main() {
             case 6: {
                 string namaStasiun;
                 cout << "\nMasukkan nama stasiun yang ingin dihapus: ";
-                cin >> namaStasiun;
+                cin.ignore(INT_MAX, '\n');
+                getline(cin, namaStasiun);
                 deleteStasiun(G, namaStasiun);
                 break;
             }

@@ -93,49 +93,77 @@ void displayGraph(Graph &G) {
     }
 }
 
-// Mencari rute terpendek menggunakan DFS
-void shortestRoute(Graph &G, string startNama, string endNama) {
-    adrStasiun startStasiun;
-    if (!findStasiun(G, startNama, startStasiun)) {
+void dfsShortestRoute(adrStasiun current, string endID, int currentWeight, int &minWeight, string path, string &shortestPath, Graph &G, string visited[], int &visitedCount) {
+    if (current == NULL) return;
+
+    // Mark the current station as visited
+    visited[visitedCount++] = namaStasiun(current);
+
+    // Append the current station to the path
+    path += namaStasiun(current) + " ";
+
+    // If we reached the destination, check if this is the shortest path
+    if (namaStasiun(current) == endID) {
+        if (currentWeight < minWeight) {
+            minWeight = currentWeight;
+            shortestPath = path;
+        }
+    } else {
+        // Explore all adjacent stations
+        adrRute r = firstRute(current);
+        while (r != NULL) {
+            bool alreadyVisited = false;
+            for (int i = 0; i < visitedCount; i++) {
+                if (visited[i] == destStasiunID(r)) {
+                    alreadyVisited = true;
+                    break;
+                }
+            }
+
+            if (!alreadyVisited) {
+                // Find the destination station pointer
+                adrStasiun destStasiun;
+                if (findStasiun(G, destStasiunID(r), destStasiun)) {
+                    dfsShortestRoute(destStasiun, endID, currentWeight + weight(r), minWeight, path, shortestPath, G, visited, visitedCount);
+                }
+            }
+            r = nextRute(r);
+        }
+    }
+
+    // Backtrack: remove the station from visited
+    visitedCount--;
+}
+
+void shortestRoute(Graph &G, string startID, string endID) {
+    adrStasiun start;
+    if (!findStasiun(G, startID, start)) {
         cout << "Stasiun awal tidak ditemukan." << endl;
         return;
     }
 
-    const int MAX_WEIGHT = INT_MAX;
-    int minWeight = MAX_WEIGHT;
+    adrStasiun end;
+    if (!findStasiun(G, endID, end)) {
+        cout << "Stasiun tujuan tidak ditemukan." << endl;
+        return;
+    }
 
-    map<string, bool> visited;
+    int minWeight = INT_MAX; // Initialize the shortest distance as infinity
+    string shortestPath = "";
+    string visited[100]; // Array to keep track of visited stations (maximum 100 stations)
+    int visitedCount = 0; // Counter for the number of visited stations
 
-    function<void(adrStasiun, int)> DFS = [&](adrStasiun S, int currentWeight) {
-        if (namaStasiun(S) == endNama) {
-            minWeight = min(minWeight, currentWeight);
-            return;
-        }
+    // Start DFS from the start station
+    dfsShortestRoute(start, endID, 0, minWeight, "", shortestPath, G, visited, visitedCount);
 
-        visited[namaStasiun(S)] = true;
-
-        adrRute R = firstRute(S);
-        while (R != nullptr) {
-            if (!visited[destStasiunID(R)]) {
-                adrStasiun destStasiun;
-                if (findStasiun(G, destStasiunID(R), destStasiun)) {
-                    DFS(destStasiun, currentWeight + weight(R));
-                }
-            }
-            R = nextRute(R);
-        }
-
-        visited[namaStasiun(S)] = false;
-    };
-
-    DFS(startStasiun, 0);
-
-    if (minWeight == MAX_WEIGHT) {
-        cout << "Tidak ada jalur dari " << startNama << " ke " << endNama << "." << endl;
+    if (minWeight == INT_MAX) {
+        cout << "Tidak ada rute dari " << startID << " ke " << endID << "." << endl;
     } else {
-        cout << "Jalur terpendek dari " << startNama << " ke " << endNama << " memiliki bobot: " << minWeight << endl;
+        cout << "Rute terpendek dari " << startID << " ke " << endID << " memiliki berat: " << minWeight << endl;
+        cout << "Rute: " << shortestPath << endl;
     }
 }
+
 bool findRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, adrRute &R) {
     adrStasiun S;
     if (findStasiun(G, fromNamaStasiun, S)) { // Cari stasiun asal
