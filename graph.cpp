@@ -1,25 +1,16 @@
 #include "graph.h"
-#include <iostream>
-#include <string>
-#include <map>         // Untuk std::map
-#include <functional>  // Untuk std::function
-#include <climits>     // Untuk INT_MAX
-using namespace std;
 
-// Membuat stasiun baru
 void createStasiun(string newNamaStasiun, adrStasiun &S) {
     S = new stasiunTransit;
     namaStasiun(S) = newNamaStasiun;
-    nextStasiun(S) = nullptr;
-    firstRute(S) = nullptr;
+    nextStasiun(S) = NULL;
+    firstRute(S) = NULL;
 }
 
-// Inisialisasi graph kosong
 void initGraph(Graph &G) {
-    firstStasiun(G) = nullptr;
+    firstStasiun(G) = NULL;
 }
 
-// Menambahkan stasiun ke dalam graph
 void addStasiun(Graph &G, string newNamaStasiun) {
     adrStasiun S;
     createStasiun(newNamaStasiun, S);
@@ -27,23 +18,22 @@ void addStasiun(Graph &G, string newNamaStasiun) {
     firstStasiun(G) = S;
 }
 
-// Menghapus stasiun dari graph
 void deleteStasiun(Graph &G, string namaStasiun) {
-    adrStasiun prev = nullptr, curr = firstStasiun(G);
+    adrStasiun prev = NULL, curr = firstStasiun(G);
 
-    while (curr != nullptr && namaStasiun(curr) != namaStasiun) {
+    while (curr != NULL && namaStasiun(curr) != namaStasiun) {
         prev = curr;
         curr = nextStasiun(curr);
     }
 
-    if (curr != nullptr) {
-        if (prev == nullptr) {
+    if (curr != NULL) {
+        if (prev == NULL) {
             firstStasiun(G) = nextStasiun(curr);
         } else {
             nextStasiun(prev) = nextStasiun(curr);
         }
 
-        while (firstRute(curr) != nullptr) {
+        while (firstRute(curr) != NULL) {
             adrRute temp = firstRute(curr);
             firstRute(curr) = nextRute(temp);
             delete temp;
@@ -53,63 +43,86 @@ void deleteStasiun(Graph &G, string namaStasiun) {
     }
 }
 
-// Menambahkan rute antara dua stasiun
-void addRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, int weight) {
+bool isRuteExist(Graph &G, string fromNamaStasiun, string toNamaStasiun) {
+    adrStasiun fromStasiun;
+    adrRute R;
+
+    // Cek apakah stasiun asal ada
+    if (findStasiun(G, fromNamaStasiun, fromStasiun)) {
+        // Cari apakah rute sudah ada untuk stasiun asal
+        R = firstRute(fromStasiun);
+        while (R != NULL) {
+            if (destStasiunID(R) == toNamaStasiun) {
+                return true;  // Rute sudah ada
+            }
+            R = nextRute(R);
+        }
+    }
+    return false;  // Rute tidak ditemukan
+}
+
+void addRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, int weight, bool sedangMaintenance) {
     adrStasiun fromStasiun, toStasiun;
     if (findStasiun(G, fromNamaStasiun, fromStasiun) && findStasiun(G, toNamaStasiun, toStasiun)) {
         adrRute R = new Rute;
         destStasiunID(R) = toNamaStasiun;
         weight(R) = weight;
+        sedangMaintenance(R) = false;
         nextRute(R) = firstRute(fromStasiun);
         firstRute(fromStasiun) = R;
     }
 }
 
-// Mencari stasiun berdasarkan nama
 bool findStasiun(Graph &G, string namaStasiun, adrStasiun &S) {
     S = firstStasiun(G);
-    while (S != nullptr) {
+    while (S != NULL) {
         if (namaStasiun(S) == namaStasiun) {
             return true;
         }
         S = nextStasiun(S);
     }
-    S = nullptr;
+    S = NULL;
     return false;
 }
 
-// Menampilkan graph
 void displayGraph(Graph &G) {
     adrStasiun S = firstStasiun(G);
-    while (S != nullptr) {
+    while (S != NULL) {
         cout << "Stasiun " << namaStasiun(S) << ": ";
         adrRute R = firstRute(S);
-        while (R != nullptr) {
-            cout << " -> " << destStasiunID(R) << " (Weight: " << weight(R) << ")";
+        while (R != NULL) {
+            cout << " -> " << destStasiunID(R);
+            if (sedangMaintenance(R)) {
+                cout << " (Sedang Maintenance)";
+            } else {
+                cout << " (Weight: " << weight(R) << ")";
+            }
             R = nextRute(R);
         }
+        cout << endl;
         cout << endl;
         S = nextStasiun(S);
     }
 }
 
+
+
 void dfsShortestRoute(adrStasiun current, string endID, int currentWeight, int &minWeight, string path, string &shortestPath, Graph &G, string visited[], int &visitedCount) {
     if (current == NULL) return;
 
-    // Mark the current station as visited
     visited[visitedCount++] = namaStasiun(current);
 
-    // Append the current station to the path
-    path += namaStasiun(current) + " ";
+    if (!path.empty()) {
+        path += " -> ";
+    }
+    path += namaStasiun(current);
 
-    // If we reached the destination, check if this is the shortest path
     if (namaStasiun(current) == endID) {
         if (currentWeight < minWeight) {
             minWeight = currentWeight;
             shortestPath = path;
         }
     } else {
-        // Explore all adjacent stations
         adrRute r = firstRute(current);
         while (r != NULL) {
             bool alreadyVisited = false;
@@ -120,8 +133,7 @@ void dfsShortestRoute(adrStasiun current, string endID, int currentWeight, int &
                 }
             }
 
-            if (!alreadyVisited) {
-                // Find the destination station pointer
+            if (!alreadyVisited && !sedangMaintenance(r)) {
                 adrStasiun destStasiun;
                 if (findStasiun(G, destStasiunID(r), destStasiun)) {
                     dfsShortestRoute(destStasiun, endID, currentWeight + weight(r), minWeight, path, shortestPath, G, visited, visitedCount);
@@ -131,7 +143,6 @@ void dfsShortestRoute(adrStasiun current, string endID, int currentWeight, int &
         }
     }
 
-    // Backtrack: remove the station from visited
     visitedCount--;
 }
 
@@ -148,12 +159,11 @@ void shortestRoute(Graph &G, string startID, string endID) {
         return;
     }
 
-    int minWeight = INT_MAX; // Initialize the shortest distance as infinity
+    int minWeight = INT_MAX;
     string shortestPath = "";
-    string visited[100]; // Array to keep track of visited stations (maximum 100 stations)
-    int visitedCount = 0; // Counter for the number of visited stations
+    string visited[100];
+    int visitedCount = 0;
 
-    // Start DFS from the start station
     dfsShortestRoute(start, endID, 0, minWeight, "", shortestPath, G, visited, visitedCount);
 
     if (minWeight == INT_MAX) {
@@ -166,16 +176,43 @@ void shortestRoute(Graph &G, string startID, string endID) {
 
 bool findRute(Graph &G, string fromNamaStasiun, string toNamaStasiun, adrRute &R) {
     adrStasiun S;
-    if (findStasiun(G, fromNamaStasiun, S)) { // Cari stasiun asal
-        R = firstRute(S); // Mulai dari rute pertama
-        while (R != nullptr) {
-            if (destStasiunID(R) == toNamaStasiun) { // Cek apakah tujuan cocok
+    if (findStasiun(G, fromNamaStasiun, S)) {
+        R = firstRute(S);
+        while (R != NULL) {
+            if (destStasiunID(R) == toNamaStasiun) {
                 return true;
             }
-            R = nextRute(R); // Lanjut ke rute berikutnya
+            R = nextRute(R);
         }
     }
-    R = nullptr; // Set nullptr jika tidak ditemukan
+    R = NULL;
     return false;
 }
 
+void startMaintenance(Graph &G, string fromNamaStasiun, string toNamaStasiun) {
+    adrRute R;
+    if (findRute(G, fromNamaStasiun, toNamaStasiun, R)) {
+        if (!sedangMaintenance(R)) {
+            sedangMaintenance(R) = true;
+            cout << "Rute dari " << fromNamaStasiun << " ke " << toNamaStasiun << " sedang dalam maintenance." << endl;
+        } else {
+            cout << "Rute sudah dalam maintenance." << endl;
+        }
+    } else {
+        cout << "Rute tidak ditemukan." << endl;
+    }
+}
+
+void reopenRoute(Graph &G, string &fromNamaStasiun, string &toNamaStasiun) {
+    adrRute R;
+    if (findRute(G, fromNamaStasiun, toNamaStasiun, R)) {
+        if (sedangMaintenance(R)) {
+            sedangMaintenance(R) = false;
+            cout << "Rute dari " << fromNamaStasiun << " ke " << toNamaStasiun << " telah dibuka kembali." << endl;
+        } else {
+            cout << "Rute dari " << fromNamaStasiun << " ke " << toNamaStasiun << " tidak sedang dalam maintenance." << endl;
+        }
+    } else {
+        cout << "Rute dari " << fromNamaStasiun << " ke " << toNamaStasiun << " tidak ditemukan." << endl;
+    }
+}
