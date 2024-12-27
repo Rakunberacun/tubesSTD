@@ -223,7 +223,21 @@ int main() {
                 getline(cin, fromNamaStasiun);
                 cout << "Masukkan nama stasiun tujuan: ";
                 getline(cin, toNamaStasiun);
-                startMaintenance(G, fromNamaStasiun, toNamaStasiun);
+
+                adrStasiun S;
+
+                bool foundAsal = findStasiun(G, fromNamaStasiun, S);
+                bool foundTujuan = findStasiun(G, toNamaStasiun, S);
+
+                if (!foundAsal && !foundTujuan) {
+                    cout << "Stasiun asal dan tujuan tidak ditemukan" << endl;
+                } else if (!foundAsal) {
+                    cout << "Stasiun asal tidak ditemukan" << endl;
+                } else if (!foundTujuan) {
+                    cout << "Stasiun tujuan tidak ditemukan" << endl;
+                } else {
+                    startMaintenance(G, fromNamaStasiun, toNamaStasiun);
+                }
                 break;
             }
             case 7: {
@@ -233,7 +247,21 @@ int main() {
                 getline(cin, fromNamaStasiun);
                 cout << "Masukkan nama stasiun tujuan: ";
                 getline(cin, toNamaStasiun);
-                reopenRoute(G, fromNamaStasiun, toNamaStasiun);
+
+                adrStasiun S;
+
+                bool foundAsal = findStasiun(G, fromNamaStasiun, S);
+                bool foundTujuan = findStasiun(G, toNamaStasiun, S);
+
+                if (!foundAsal && !foundTujuan) {
+                    cout << "Stasiun asal dan tujuan tidak ditemukan" << endl;
+                } else if (!foundAsal) {
+                    cout << "Stasiun asal tidak ditemukan" << endl;
+                } else if (!foundTujuan) {
+                    cout << "Stasiun tujuan tidak ditemukan" << endl;
+                } else {
+                    reopenRoute(G, fromNamaStasiun, toNamaStasiun);
+                }
                 break;
             }
             case 9:
